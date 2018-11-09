@@ -90,10 +90,88 @@ def isWin(maps):
 # lost : -9999999
 # 1 : 10
 # *1 : 10/2
+# 2 : 10*10
+# *2 : 10*10/2
+# 3 : 10*10*10
+# *3 : 10*10*10/2
+# *n* ： 1
 # @return  win值(正) + lost值(负)
 def mjurge(maps):
+	res_score = 0
+	# 统计连数，并确定是否单遮挡或双遮挡
+	def __jurge__(info_list,style,flags,flagkey,x,y,maps):
+		maps_size = len(maps)
+		if flags[flagkey] is 1:
+			# out of range
+			if x >= maps_size or x < 0 or y >= maps_size or y < 0:
+				# add half 遮挡 + 1
+				# 遮挡设置 -1
+				flags[flagkey] = -1
+			else:
+				if maps[y][x] is 1:
+					info_list[style][0] += 1
+				elif maps[y][x] is 0:
+					flags[flagkey] = 0
+				# enemy node
+				elif maps[y][x] is -1:
+					flagkey[flagkey] = -1
+				else:
+					raise Exception("error value in mjurge  __jurge__ with y:{}  x:{}".format(y,x))
+			pass
+		pass
+	for _py,_px in cset:
+		_t_score = 0
+		# ls : Left slash 	: \
+		# rs : right slash : /
+		# ver : vertical 	: |
+		# hor : Horizontal : -
+		link_infos = {"ls":[1,0],"rs":[1,0],"ver":[1,0],"hor":[1,0]}
+		flags = {"ls_up":1,"ls_down":1,"rs_up":1,"rs_down":1,"left":1,"right":1,"up":1,"down":1}
+		for i in range(1,5):
+			# \
+			_x,_y = _px-i,_py-i
+			__jurge__(link_infos,"ls",flags,"ls_up",_x,_y,maps)
+			_x,_y = _px+i,_py+i
+			__jurge__(link_infos,"ls",flags,"ls_down",_x,_y,maps)
 
+			# /
+			_x,_y = _px+i,_py-i
+			__jurge__(link_infos,"rs",flags,"rs_up",_x,_y,maps)
+			_x,_y = _px-i,_py+i
+			__jurge__(link_infos,"rs",flags,"rs_down",_x,_y,maps)
+
+			# -
+			_x = _px-i
+			__jurge__(link_infos,"ver",flags,"left",_x,_py,maps)
+			_x = _px+i
+			__jurge__(link_infos,"ver",flags,"right",_x,_py,maps)
+
+			# |
+			_y = _py-i
+			__jurge__(link_infos,"hor",flags,"up",_px,_y,maps)
+			_y = _py+i
+			__jurge__(link_infos,"hor",flags,"down",_px,_y,maps)
+
+		# 遮挡值 0 + 1 | 1 + 1 | 0 + 0
+		link_infos["ls"][1] = -flags["ls_up"] + (-flags["ls_down"])
+		link_infos["rs"][1] = -flags["rs_up"] + (-flags["rs_down"])
+		link_infos["ver"][1] = -flags["left"] + (-flags["right"])
+		link_infos["hor"][1] = -flags["up"] + (-flags["down"])
+	
+		# 叠加点集合值统计
+		for v in link_infos.values():
+			link,block = v[0],v[1]
+			if block is 2:
+				_t_score += 1
+			elif block is 1:
+				_t_score += 10**link/2
+			elif block is 0:
+				_t_score += 10**link
+			else:
+				raise Exception("an Error in value count with value link:{}  block:{}".format(link,block))
+		res_score += _t_score
 	pass
+	return res_score
 
 def main():
 	init(mmap)
@@ -103,6 +181,8 @@ def main():
 	r = isWin(mmap)
 	print(cset)
 	print(r)
+	s = mjurge(mmap)
+	print("score ===> ",s)
 	pass
 
 if __name__ == '__main__':
