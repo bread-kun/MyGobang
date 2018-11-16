@@ -1,6 +1,6 @@
 from graphics import *
 from math import *
-from GoBang import *
+from gobang_min import *
 
 SIZE = 21
 BACKGROUND = "#dacc13"
