@@ -12,6 +12,7 @@ class GoBang():
 	def move(self, player, node):
 		assert len(node) is 2 , ("An Error happend on move function because node:",node)
 		y,x = node
+		assert self.map[y][x] is 0, ("",node,"点都点过了还想怎样？搞事情是吧")
 		self.map[y][x] = player
 		self.get_history(player).append((y,x))
 

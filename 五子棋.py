@@ -66,6 +66,7 @@ def main():
 			game_flag = game.think(game.PLAYER_2)
 			can_move_flag = 1
 	pass
+	show(win,game)
 	box = Rectangle(Point(100,100),Point(300,300))
 	box.setFill("#fff")
 	box.draw(win)
